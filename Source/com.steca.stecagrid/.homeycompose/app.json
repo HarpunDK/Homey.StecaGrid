@@ -1,0 +1,29 @@
+{
+  "id": "com.steca.stecagrid",
+  "version": "1.0.0",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "StecaGrid"
+  },
+  "description": {
+    "en": "Adds support for StecaGrid Power Inverters"
+  },
+  "category": [
+    "energy"
+  ],
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Kim Kokholm",
+    "email": "kokholm@gmail.com"
+  },
+  "brandColor": "#00b4dc"
+}

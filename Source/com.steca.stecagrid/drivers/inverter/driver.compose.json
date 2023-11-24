@@ -1,12 +1,21 @@
 {
   "name": {
-    "en": "StecaGrid 6003"
+    "en": "Inverter"
   },
   "class": "solarpanel",
   "capabilities": [
     "meter_power",
-    "measure_power"
+    "measure_temperature",
+    "measure_voltage"
   ],
+  "capabilitiesOptions": {
+    "measure_temperature": {
+      "title": "Inside temperature"
+    },
+    "meter_power": {
+      "title": "Production"
+    }
+  },
   "platforms": [
     "local"
   ],

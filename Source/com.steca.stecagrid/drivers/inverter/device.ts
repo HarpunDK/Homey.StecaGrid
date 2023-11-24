@@ -2,6 +2,7 @@ import Homey from 'homey';
 import axios from 'axios';
 import _ from 'underscore';
 import moment from 'moment';
+import xml from 'xml-js';
 
 class StecaDevice extends Homey.Device {
 
@@ -10,11 +11,18 @@ class StecaDevice extends Homey.Device {
    */
   async onInit() {
     this.log('StecaDevice has been initialized');
+    
     const stecaBaseUrl = this.homey.settings.get("StecaGridBaseUrl");
     
-    await this.setCapabilityValue("measure_power", 0); // Spinning up
+    // RESETTING
+    await this.setCapabilityValue("meter_power", 0);
+    await this.setCapabilityValue("measure_temperature", 0);
+    await this.setCapabilityValue("measure_voltage", 0);
+    //await this.setCapabilityValue("measure_power", 1);
+
+
     await this.loadCurrentData(stecaBaseUrl);
-    setInterval(async () => {
+    this.homey.setInterval(async () => {
       await this.loadCurrentData(stecaBaseUrl);
     }, 2 * 60 * 1000 /* pull every 2. minute */);
 
@@ -62,18 +70,47 @@ class StecaDevice extends Homey.Device {
    * onDeleted is called when the user deleted the device.
    */
   async onDeleted() {
-    this.log('MyDevice has been deleted');
+    this.log('StecaDevice has been deleted');
   }
   
   public loadCurrentData = async (baseUrl:string) => {
       var currentTimestamp = moment().utc().valueOf();
-      var earlierTimestamp = 1700517970849;
 
-      var todayNoon = moment("2023-11-20 12:30", "YYYY-MM-DD hh:mm").utc().valueOf();
+      var response = await axios.get(`${baseUrl}/measurements.xml?${currentTimestamp}`).then();
+      // this.log("RESP", response.data);
 
-// Figure out etc or not
-      this.log("loading data", baseUrl, "Before", earlierTimestamp, "now", currentTimestamp, currentTimestamp > earlierTimestamp, moment(earlierTimestamp), "DIFF", currentTimestamp - earlierTimestamp, "TODAY", todayNoon, moment(todayNoon));
-      await this.setCapabilityValue("measure_power", 0); // Spinning up
+      var dataJsonStr = xml.xml2json(response.data, {compact: true});
+      var dataJson = JSON.parse(dataJsonStr);
+      //this.log("Json", "-->", dataJson);
+
+      if (dataJson.root != null && dataJson.root.Device != null) {
+        // Data available:
+
+        var matchingPowerAttr = _.find(dataJson.root.Device.Measurements.Measurement, (measurement:any) => {
+          return measurement._attributes.Type === "AC_Power";
+        });
+
+        var matchingTempAttr = _.find(dataJson.root.Device.Measurements.Measurement, (measurement:any) => {
+          return measurement._attributes.Type === "Temp";
+        });
+
+        var matchingVoltageAttr = _.find(dataJson.root.Device.Measurements.Measurement, (measurement:any) => {
+          return measurement._attributes.Type === "DC_Voltage";
+        });
+
+        // this.log("READ", matchingPowerAttr, matchingTempAttr, matchingVoltageAttr);
+
+        if (matchingPowerAttr != null)
+           await this.setCapabilityValue("meter_power", (+matchingPowerAttr._attributes.Value /1000)); // Spinning up
+
+        if (matchingTempAttr != null)
+          await this.setCapabilityValue("measure_temperature", +matchingTempAttr._attributes.Value); // Spinning up
+
+        if (matchingVoltageAttr != null)
+          await this.setCapabilityValue("measure_voltage", +matchingVoltageAttr._attributes.Value); // Spinning up
+
+      }
+
   }
 
 }

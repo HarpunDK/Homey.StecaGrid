@@ -1,6 +1,6 @@
 {
   "id": "com.steca.stecagrid",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "platforms": [
@@ -25,5 +25,19 @@
     "name": "Kim Kokholm",
     "email": "kokholm@gmail.com"
   },
-  "brandColor": "#00b4dc"
+  "brandColor": "#00b4dc",
+  "source": "https://github.com/HarpunDK/Homey.StecaGrid",
+  "support": "https://github.com/HarpunDK/Homey.StecaGrid",
+  "bugs": {
+    "url": "https://github.com/HarpunDK/Homey.StecaGrid"
+  },
+  "homepage": "https://github.com/HarpunDK/Homey.StecaGrid",
+  "contributors": {
+    "developers": []
+  },
+  "tags": {
+    "en": [
+      "Inverter"
+    ]
+  }
 }

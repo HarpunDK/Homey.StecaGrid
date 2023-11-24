@@ -17,6 +17,7 @@
     "axios": "^1.6.2",
     "moment": "^2.29.4",
     "momentjs": "^2.0.0",
-    "underscore": "^1.13.6"
+    "underscore": "^1.13.6",
+    "xml-js": "^1.6.11"
   }
 }

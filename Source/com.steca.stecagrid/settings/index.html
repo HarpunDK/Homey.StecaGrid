@@ -24,6 +24,18 @@
             <input class="homey-form-input" id="inputBaseUrlValue" type="text" value="" placeholder="Base Url value here" />
             <small class="text-muted">Example: http://192.168.1.166</small>
         </div>
+
+        <div class="homey-form-group">
+            <label class="homey-form-label" for="inputPullIntervalValue">Pull data interval</label>
+            <input class="homey-form-input"  id="inputPullIntervalValue" type="number" value="" placeholder="Pull frequency in seconds" />
+            <small class="text-muted">Frequency in seconds. How often to pull for data. Default i 30 seconds (30).</small>
+        </div>
+
+        <hr />
+
+        <div class="homey-form-group">
+            <strong>Remark</strong> Please restart the app, after changing settings.
+        </div>
         
     </fieldset>
 
@@ -35,12 +47,18 @@
             // Tell Homey we're ready to be displayed
             Homey.ready();
 
-            var inputBaseUrlValueElement    = document.getElementById("inputBaseUrlValue");
+            var inputBaseUrlValueElement        = document.getElementById("inputBaseUrlValue");
+            var inputPullIntervalValueElement   = document.getElementById("inputPullIntervalValue");
             var saveElement = document.getElementById("save");
 
             Homey.get("StecaGridBaseUrl", function (err, baseUrl) {
                 if (err) return Homey.alert(err);
                 inputBaseUrlValueElement.value = baseUrl;
+            });
+
+            Homey.get("StecaGridPullInterval", function (err, pullInterval) {
+                if (err) return Homey.alert(err);
+                inputPullIntervalValueElement.value = pullInterval ?? "30";
             });
             
             saveElement.addEventListener("click", function (e) {
@@ -52,6 +70,14 @@
                         return Homey.alert(err);
                     } 
                 });
+
+                Homey.set("StecaGridPullInterval", inputPullIntervalValueElement.value, function (err) {
+                    if (err) {
+                        anySaveErrors = true;
+                        return Homey.alert(err);
+                    } 
+                });
+                
                 
                 if (!anySaveErrors)
                     return Homey.alert("Settings saved. You can close this dialog now.");

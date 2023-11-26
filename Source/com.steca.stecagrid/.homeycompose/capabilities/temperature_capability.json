@@ -1,0 +1,11 @@
+{
+    "type": "number",
+    "title": { "en": "Internal temperature", "da": "Indvendig temperatur" },
+    "uiComponent": "sensor",
+    "getable": true,
+    "setable": true,
+    "units": { "en": "°C" },
+    "min": 0,
+    "insights": true,
+    "icon": "/assets/images/temperature-quarter-thin.svg"
+  }

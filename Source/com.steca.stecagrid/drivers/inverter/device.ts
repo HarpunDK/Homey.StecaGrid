@@ -13,18 +13,19 @@ class StecaDevice extends Homey.Device {
     this.log('StecaDevice has been initialized');
     
     const stecaBaseUrl = this.homey.settings.get("StecaGridBaseUrl");
+    var stecaPullInterval = +(this.homey.settings.get("StecaGridPullInterval") || "30");
     
     // RESETTING
-    await this.setCapabilityValue("meter_power", 0);
-    await this.setCapabilityValue("measure_temperature", 0);
-    await this.setCapabilityValue("measure_voltage", 0);
+    await this.setCapabilityValue("production_capability", 0);
+    await this.setCapabilityValue("temperature_capability", 0);
+    await this.setCapabilityValue("voltage_capability", 0);
     //await this.setCapabilityValue("measure_power", 1);
 
 
     await this.loadCurrentData(stecaBaseUrl);
     this.homey.setInterval(async () => {
       await this.loadCurrentData(stecaBaseUrl);
-    }, 2 * 60 * 1000 /* pull every 2. minute */);
+    }, stecaPullInterval * 1000 /* pull every 2. minute */);
 
 
 
@@ -76,6 +77,7 @@ class StecaDevice extends Homey.Device {
   public loadCurrentData = async (baseUrl:string) => {
       var currentTimestamp = moment().utc().valueOf();
 
+    try {
       var response = await axios.get(`${baseUrl}/measurements.xml?${currentTimestamp}`).then();
       // this.log("RESP", response.data);
 
@@ -101,15 +103,20 @@ class StecaDevice extends Homey.Device {
         // this.log("READ", matchingPowerAttr, matchingTempAttr, matchingVoltageAttr);
 
         if (matchingPowerAttr != null)
-           await this.setCapabilityValue("meter_power", (+matchingPowerAttr._attributes.Value /1000)); // Spinning up
+           await this.setCapabilityValue("production_capability", (+matchingPowerAttr._attributes.Value /1000)); // Spinning up
 
         if (matchingTempAttr != null)
-          await this.setCapabilityValue("measure_temperature", +matchingTempAttr._attributes.Value); // Spinning up
+          await this.setCapabilityValue("temperature_capability", +matchingTempAttr._attributes.Value); // Spinning up
 
         if (matchingVoltageAttr != null)
-          await this.setCapabilityValue("measure_voltage", +matchingVoltageAttr._attributes.Value); // Spinning up
+          await this.setCapabilityValue("voltage_capability", +matchingVoltageAttr._attributes.Value); // Spinning up
 
       }
+    } catch (e:any){
+        this.error("Error occured during load of data.");
+    }
+
+
 
   }
 

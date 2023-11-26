@@ -41,16 +41,17 @@
       "Inverter"
     ]
   },
+  "homeyCommunityTopicId": 95676,
   "drivers": [
     {
       "name": {
-        "en": "Inverter"
+        "en": "StecaGrid Inverter"
       },
       "class": "solarpanel",
       "capabilities": [
-        "meter_power",
-        "measure_temperature",
-        "measure_voltage"
+        "production_capability",
+        "temperature_capability",
+        "voltage_capability"
       ],
       "capabilitiesOptions": {
         "measure_temperature": {
@@ -86,5 +87,55 @@
       ],
       "id": "inverter"
     }
-  ]
+  ],
+  "capabilities": {
+    "production_capability": {
+      "type": "number",
+      "title": {
+        "en": "Production now",
+        "da": "Udgangseffekt"
+      },
+      "uiComponent": "sensor",
+      "getable": true,
+      "setable": true,
+      "units": {
+        "en": "W"
+      },
+      "min": 0,
+      "insights": true,
+      "icon": "/assets/images/house-day-thin.svg"
+    },
+    "temperature_capability": {
+      "type": "number",
+      "title": {
+        "en": "Internal temperature",
+        "da": "Indvendig temperatur"
+      },
+      "uiComponent": "sensor",
+      "getable": true,
+      "setable": true,
+      "units": {
+        "en": "°C"
+      },
+      "min": 0,
+      "insights": true,
+      "icon": "/assets/images/temperature-quarter-thin.svg"
+    },
+    "voltage_capability": {
+      "type": "number",
+      "title": {
+        "en": "Voltage",
+        "da": "Spænding"
+      },
+      "uiComponent": "sensor",
+      "getable": true,
+      "setable": true,
+      "units": {
+        "en": "V"
+      },
+      "min": 0,
+      "insights": true,
+      "icon": "/assets/images/bolt-sharp-light.svg"
+    }
+  }
 }

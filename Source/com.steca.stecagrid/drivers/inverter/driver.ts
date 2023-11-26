@@ -16,9 +16,15 @@ class StecaDriver extends Homey.Driver {
   async onPairListDevices() {
     return [
       {
-        name: "StecaGrid Inverter",
+        name: "StecaGrid 6003",
         data: {
           id: "Inverter"
+        }
+      },
+      {
+        name: "StecaGrid 4200",
+        data: {
+          id: "Inverter<"
         }
       }
     ];

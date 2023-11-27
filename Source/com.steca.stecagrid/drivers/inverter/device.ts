@@ -1,8 +1,7 @@
 import Homey from 'homey';
-import axios from 'axios';
 import _ from 'underscore';
-import moment from 'moment';
-import xml from 'xml-js';
+import { StecaDeviceStrategy } from '../../Service/StecaDeviceStrategy';
+import { IStecaDevice } from '../../Service/IStecaDevice';
 
 class StecaDevice extends Homey.Device {
 
@@ -13,18 +12,25 @@ class StecaDevice extends Homey.Device {
     this.log('StecaDevice has been initialized');
     
     const stecaBaseUrl = this.homey.settings.get("StecaGridBaseUrl");
+    var stecaPullInterval = +(this.homey.settings.get("StecaGridPullInterval") || "30");
+    var deviceData = this.getData();
+    var stecaDeviceVersion = deviceData.id;
+
+    this.log("DEVICE", "-->", stecaDeviceVersion);
     
     // RESETTING
-    await this.setCapabilityValue("meter_power", 0);
-    await this.setCapabilityValue("measure_temperature", 0);
-    await this.setCapabilityValue("measure_voltage", 0);
+    await this.setCapabilityValue("production_capability", 0);
+    await this.setCapabilityValue("temperature_capability", 0);
+    await this.setCapabilityValue("voltage_capability", 0);
     //await this.setCapabilityValue("measure_power", 1);
 
+    var stecaDeviceStrategy = new StecaDeviceStrategy(stecaDeviceVersion, stecaBaseUrl);
 
-    await this.loadCurrentData(stecaBaseUrl);
+
+    await this.loadCurrentData(stecaDeviceStrategy, stecaBaseUrl);
     this.homey.setInterval(async () => {
-      await this.loadCurrentData(stecaBaseUrl);
-    }, 2 * 60 * 1000 /* pull every 2. minute */);
+      await this.loadCurrentData(stecaDeviceStrategy, stecaBaseUrl);
+    }, stecaPullInterval * 1000 /* pull every 2. minute */);
 
 
 
@@ -73,43 +79,57 @@ class StecaDevice extends Homey.Device {
     this.log('StecaDevice has been deleted');
   }
   
-  public loadCurrentData = async (baseUrl:string) => {
-      var currentTimestamp = moment().utc().valueOf();
+  public loadCurrentData = async (stecaDevice : IStecaDevice, baseUrl:string) => {
+    
+    var inverterData = await stecaDevice.GetData();
+    this.log("InverterData", "READ", inverterData);
+    await this.setCapabilityValue("production_capability", inverterData.Power);
+    await this.setCapabilityValue("temperature_capability", inverterData.Temperature); 
+    await this.setCapabilityValue("voltage_capability", inverterData.Voltage);
+    await this.setCapabilityValue("alarm_capability", inverterData.HasError);
 
-      var response = await axios.get(`${baseUrl}/measurements.xml?${currentTimestamp}`).then();
-      // this.log("RESP", response.data);
+    //   var currentTimestamp = moment().utc().valueOf();
 
-      var dataJsonStr = xml.xml2json(response.data, {compact: true});
-      var dataJson = JSON.parse(dataJsonStr);
-      //this.log("Json", "-->", dataJson);
+    // try {
+    //   var response = await axios.get(`${baseUrl}/measurements.xml?${currentTimestamp}`).then();
+    //   // this.log("RESP", response.data);
 
-      if (dataJson.root != null && dataJson.root.Device != null) {
-        // Data available:
+    //   var dataJsonStr = xml.xml2json(response.data, {compact: true});
+    //   var dataJson = JSON.parse(dataJsonStr);
+    //   //this.log("Json", "-->", dataJson);
 
-        var matchingPowerAttr = _.find(dataJson.root.Device.Measurements.Measurement, (measurement:any) => {
-          return measurement._attributes.Type === "AC_Power";
-        });
+    //   if (dataJson.root != null && dataJson.root.Device != null) {
+    //     // Data available:
 
-        var matchingTempAttr = _.find(dataJson.root.Device.Measurements.Measurement, (measurement:any) => {
-          return measurement._attributes.Type === "Temp";
-        });
+    //     var matchingPowerAttr = _.find(dataJson.root.Device.Measurements.Measurement, (measurement:any) => {
+    //       return measurement._attributes.Type === "AC_Power";
+    //     });
 
-        var matchingVoltageAttr = _.find(dataJson.root.Device.Measurements.Measurement, (measurement:any) => {
-          return measurement._attributes.Type === "DC_Voltage";
-        });
+    //     var matchingTempAttr = _.find(dataJson.root.Device.Measurements.Measurement, (measurement:any) => {
+    //       return measurement._attributes.Type === "Temp";
+    //     });
 
-        // this.log("READ", matchingPowerAttr, matchingTempAttr, matchingVoltageAttr);
+    //     var matchingVoltageAttr = _.find(dataJson.root.Device.Measurements.Measurement, (measurement:any) => {
+    //       return measurement._attributes.Type === "DC_Voltage";
+    //     });
 
-        if (matchingPowerAttr != null)
-           await this.setCapabilityValue("meter_power", (+matchingPowerAttr._attributes.Value /1000)); // Spinning up
+    //     // this.log("READ", matchingPowerAttr, matchingTempAttr, matchingVoltageAttr);
 
-        if (matchingTempAttr != null)
-          await this.setCapabilityValue("measure_temperature", +matchingTempAttr._attributes.Value); // Spinning up
+    //     if (matchingPowerAttr != null)
+    //        await this.setCapabilityValue("production_capability", (+matchingPowerAttr._attributes.Value /1000)); // Spinning up
 
-        if (matchingVoltageAttr != null)
-          await this.setCapabilityValue("measure_voltage", +matchingVoltageAttr._attributes.Value); // Spinning up
+    //     if (matchingTempAttr != null)
+    //       await this.setCapabilityValue("temperature_capability", +matchingTempAttr._attributes.Value); // Spinning up
 
-      }
+    //     if (matchingVoltageAttr != null)
+    //       await this.setCapabilityValue("voltage_capability", +matchingVoltageAttr._attributes.Value); // Spinning up
+
+    //   }
+    // } catch (e:any){
+    //     this.error("Error occured during load of data.");
+    // }
+
+
 
   }
 

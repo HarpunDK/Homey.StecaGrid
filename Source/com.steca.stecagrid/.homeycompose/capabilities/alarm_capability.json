@@ -1,0 +1,9 @@
+{
+  "type": "boolean",
+  "title": { "en": "Error read" },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "sensor",
+  "uiQuickAction": true,
+  "icon": "/assets/images/thin-ethernet-slash.svg"
+}

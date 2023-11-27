@@ -18,13 +18,13 @@ class StecaDriver extends Homey.Driver {
       {
         name: "StecaGrid 6003",
         data: {
-          id: "Inverter"
+          id: "Inverter 6003"
         }
       },
       {
         name: "StecaGrid 4200",
         data: {
-          id: "Inverter<"
+          id: "Inverter 4200"
         }
       }
     ];

@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "com.steca.stecagrid",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "platforms": [
@@ -11,7 +11,7 @@
     "en": "StecaGrid"
   },
   "description": {
-    "en": "Adds support for StecaGrid Power Inverters"
+    "en": "Get your data from your inverter right into Homey."
   },
   "category": [
     "energy"
@@ -41,6 +41,13 @@
       "Inverter"
     ]
   },
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "KimKokholm"
+      }
+    }
+  },
   "homeyCommunityTopicId": 95676,
   "drivers": [
     {
@@ -51,7 +58,8 @@
       "capabilities": [
         "production_capability",
         "temperature_capability",
-        "voltage_capability"
+        "voltage_capability",
+        "alarm_capability"
       ],
       "capabilitiesOptions": {
         "measure_temperature": {
@@ -89,6 +97,17 @@
     }
   ],
   "capabilities": {
+    "alarm_capability": {
+      "type": "boolean",
+      "title": {
+        "en": "Error read"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "sensor",
+      "uiQuickAction": true,
+      "icon": "/assets/images/thin-ethernet-slash.svg"
+    },
     "production_capability": {
       "type": "number",
       "title": {

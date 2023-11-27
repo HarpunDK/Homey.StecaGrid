@@ -1,6 +1,6 @@
 {
   "id": "com.steca.stecagrid",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "platforms": [
@@ -10,7 +10,7 @@
     "en": "StecaGrid"
   },
   "description": {
-    "en": "Adds support for StecaGrid Power Inverters"
+    "en": "Get your data from your inverter right into Homey."
   },
   "category": [
     "energy"
@@ -39,6 +39,13 @@
     "en": [
       "Inverter"
     ]
+  },
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "KimKokholm"
+      }
+    }
   },
   "homeyCommunityTopicId": 95676
 }

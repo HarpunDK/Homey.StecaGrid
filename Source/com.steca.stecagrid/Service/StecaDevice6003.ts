@@ -18,7 +18,7 @@ export class StecaDevice6003 implements IStecaDevice {
 
     public async GetData() : Promise<DeviceReadInfo> {
         // Get data from endpoint: /measurements.xml + timestamp
-        console.log("STRATEGY ACTIVATED", 6003);
+        //console.log("STRATEGY ACTIVATED", 6003);
 
         var currentTimestamp = moment().utc().valueOf();
 
@@ -52,7 +52,7 @@ export class StecaDevice6003 implements IStecaDevice {
             var voltage = 0;
 
             if (matchingPowerAttr != null)
-               power = +(matchingPowerAttr._attributes.Value != null ? matchingPowerAttr._attributes.Value : 0) /1000;
+               power = +(matchingPowerAttr._attributes.Value != null ? matchingPowerAttr._attributes.Value : 0);
 
             if (matchingTempAttr != null)
               temperature = +matchingTempAttr._attributes.Value;

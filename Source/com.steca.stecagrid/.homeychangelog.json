@@ -7,5 +7,8 @@
   },
   "1.1.0": {
     "en": "Support both StecaGrid 6003 and StecaGrid 4200. This release includes breaking changes, so pleace remove/add device and make sure to visit the settings-section."
+  },
+  "1.1.1": {
+    "en": "Hotfix. More debug info."
   }
 }

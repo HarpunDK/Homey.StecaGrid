@@ -4,6 +4,5 @@
   "getable": true,
   "setable": true,
   "uiComponent": "sensor",
-  "uiQuickAction": true,
   "icon": "/assets/images/thin-ethernet-slash.svg"
 }

@@ -1,0 +1,32 @@
+[
+    {
+        "type": "group",
+        "label": {
+            "en": "Connection"
+        },
+        "children": [
+          {
+            "id": "override-device-ip",
+            "type": "checkbox",
+            "label": { 
+              "en": "Override IP"
+            },
+            "value": false,
+            "hint": { 
+              "en": "Use Protocol and IP from device settings (box below)"
+             }
+          },
+          {
+            "id": "device-ip",
+            "type": "text",
+            "label": { 
+              "en": "Protocol and IP address"
+            },
+            "value": "http://192.168.1.xxx",
+            "hint": { 
+              "en": "Specify the IP of the printer."
+             }
+          }
+        ]
+    }
+]

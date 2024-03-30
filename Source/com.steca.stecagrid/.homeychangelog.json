@@ -13,5 +13,8 @@
   },
   "1.1.2": {
     "en": "Alarm capability updated."
+  },
+  "1.1.3": {
+    "en": "Support for multiple inverters. Local settings vs global settings."
   }
 }

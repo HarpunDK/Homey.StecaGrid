@@ -4,6 +4,6 @@ export interface IStecaDevice {
 
     GetSupportedDevice():string;
 
-    GetData() : Promise<DeviceReadInfo>
+    GetData(deviceBaseurl: string) : Promise<DeviceReadInfo>
 
 }

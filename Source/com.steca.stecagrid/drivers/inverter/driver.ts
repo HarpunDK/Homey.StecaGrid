@@ -14,17 +14,19 @@ class StecaDriver extends Homey.Driver {
    * This should return an array with the data of devices that are available for pairing.
    */
   async onPairListDevices() {
+    const randomNum = Math.floor(Math.random() * 1000000);
+
     return [
       {
         name: "StecaGrid 6003",
         data: {
-          id: "Inverter 6003"
+          id: `Inverter 6003#${randomNum}`
         }
       },
       {
         name: "StecaGrid 4200",
         data: {
-          id: "Inverter 4200"
+          id: `Inverter 4200#${randomNum}`
         }
       }
     ];

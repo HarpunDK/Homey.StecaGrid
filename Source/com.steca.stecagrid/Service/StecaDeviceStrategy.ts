@@ -7,7 +7,7 @@ import { StecaDevice6003 } from "./StecaDevice6003";
 
 export class StecaDeviceStrategy implements IStecaDevice {
 
-    constructor(public stecaDeviceVersion: string, public baseUrl: string) {
+    constructor(public stecaDeviceVersion: string) {
                 
     }
 
@@ -15,18 +15,18 @@ export class StecaDeviceStrategy implements IStecaDevice {
         return "GENERIC";
     }
 
-    public async GetData() : Promise<DeviceReadInfo> {
+    public async GetData(deviceBaseUrl: string) : Promise<DeviceReadInfo> {
         
-        var strategies = this.CreateStrategies();
+        var strategies = this.CreateStrategies(deviceBaseUrl);
         
         var matchingStecaDevice = _.find(strategies, (strategy) => strategy.GetSupportedDevice() === this.stecaDeviceVersion);
         return await matchingStecaDevice?.GetData() || new DeviceReadInfo(0,0,0, true);
     }
 
-    private CreateStrategies = () => {
+    private CreateStrategies = (deviceBaseUrl: string) => {
         return [
-            new StecaDevice4200(this.baseUrl),
-            new StecaDevice6003(this.baseUrl)
+            new StecaDevice4200(deviceBaseUrl),
+            new StecaDevice6003(deviceBaseUrl)
         ]
     }
 

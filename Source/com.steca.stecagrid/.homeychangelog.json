@@ -16,5 +16,8 @@
   },
   "1.1.3": {
     "en": "Support for multiple inverters. Local settings vs global settings."
+  },
+  "1.1.4": {
+    "en": "Meter_power added."
   }
 }

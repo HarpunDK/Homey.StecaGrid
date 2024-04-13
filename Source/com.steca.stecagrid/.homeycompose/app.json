@@ -1,6 +1,6 @@
 {
   "id": "com.steca.stecagrid",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "platforms": [
@@ -10,7 +10,7 @@
     "en": "StecaGrid"
   },
   "description": {
-    "en": "Get your data from your inverter right into Homey."
+    "en": "Coolcept inverters for single-family houses and residential buildings"
   },
   "category": [
     "energy"

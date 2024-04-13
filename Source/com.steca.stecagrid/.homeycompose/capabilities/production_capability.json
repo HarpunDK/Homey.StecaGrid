@@ -7,5 +7,6 @@
     "units": { "en": "W" },
     "min": 0,
     "insights": true,
+    "uiQuickAction": true,
     "icon": "/assets/images/house-day-thin.svg"
   }

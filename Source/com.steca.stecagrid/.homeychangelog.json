@@ -19,5 +19,8 @@
   },
   "1.1.4": {
     "en": "Meter_power added."
+  },
+  "1.1.5": {
+    "en": "Override builtin capability unit."
   }
 }

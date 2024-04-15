@@ -20,12 +20,12 @@ class StecaDevice extends Homey.Device {
     this.log("DEVICE", "-->", stecaDeviceVersion);
     
     // RESETTING
+    this.setCapabilityOptions("meter_power", { "units": { "en": "W" } });
     await this.setCapabilityValue("meter_power", 0);
     await this.setCapabilityValue("production_capability", 0);
     await this.setCapabilityValue("temperature_capability", 0);
     await this.setCapabilityValue("voltage_capability", 0);
     //await this.setCapabilityValue("measure_power", 1);
-
     var stecaDeviceStrategy = new StecaDeviceStrategy(stecaDeviceVersion);
 
 
@@ -90,7 +90,7 @@ class StecaDevice extends Homey.Device {
     var inverterData = await stecaDevice.GetData(deviceBaseUrl);
     this.log("InverterData", "READ", inverterData);
     
-    await this.setCapabilityValue("meter_power", inverterData.Power/1000);
+    await this.setCapabilityValue("meter_power", inverterData.Power);
     await this.setCapabilityValue("production_capability", inverterData.Power);
     await this.setCapabilityValue("temperature_capability", inverterData.Temperature); 
     await this.setCapabilityValue("voltage_capability", inverterData.Voltage);

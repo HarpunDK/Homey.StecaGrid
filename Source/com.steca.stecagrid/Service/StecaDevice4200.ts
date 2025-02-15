@@ -34,12 +34,12 @@ export class StecaDevice4200 implements IStecaDevice {
             const dataInt_p = parseInt(tmpDone_p, 10);
             const power = Number.isNaN(dataInt_p) ? 0 : dataInt_p;
             
-            return new DeviceReadInfo(power, 0, 0, false); // Error read  
+            return new DeviceReadInfo(power, 0, 0, power, false); // Error read  
           } catch (e:any){
               console.error("Error occured during load of data.", endpoint, "ERROR", e);
               
           }
   
-          return new DeviceReadInfo(0, 0, 0, true); // Error read  
+          return new DeviceReadInfo(0, 0, 0, 0, true); // Error read  
     }
 }

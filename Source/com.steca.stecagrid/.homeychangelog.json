@@ -22,5 +22,8 @@
   },
   "1.1.5": {
     "en": "Override builtin capability unit."
+  },
+  "1.1.6": {
+    "en": "measure_power added."
   }
 }

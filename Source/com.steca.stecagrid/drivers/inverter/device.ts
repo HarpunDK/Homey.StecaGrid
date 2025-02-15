@@ -90,11 +90,14 @@ class StecaDevice extends Homey.Device {
     var inverterData = await stecaDevice.GetData(deviceBaseUrl);
     this.log("InverterData", "READ", inverterData);
     
-    await this.setCapabilityValue("meter_power", inverterData.Power);
+    await this.setCapabilityValue("meter_power", inverterData.ProductionTotal);
     await this.setCapabilityValue("production_capability", inverterData.Power);
     await this.setCapabilityValue("temperature_capability", inverterData.Temperature); 
     await this.setCapabilityValue("voltage_capability", inverterData.Voltage);
     await this.setCapabilityValue("alarm_capability", inverterData.HasError);
+
+    if (this.hasCapability("measure_power"))
+      await this.setCapabilityValue("measure_power", inverterData.Power);
   }
 
   private ResolveDeviceBaseUrl = () : string => {

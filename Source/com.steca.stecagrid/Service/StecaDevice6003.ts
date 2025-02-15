@@ -23,12 +23,12 @@ export class StecaDevice6003 implements IStecaDevice {
         var currentTimestamp = moment().utc().valueOf();
 
         try {
-          var response = await axios.get(`${this.baseUrl}/measurements.xml?${currentTimestamp}`).then();
-          // this.log("RESP", response.data);
+          var response = await axios.get(`${this.baseUrl}/all.xml`).then();
+          //console.log("RESP", response.data);
 
           var dataJsonStr = xml.xml2json(response.data, {compact: true});
           var dataJson = JSON.parse(dataJsonStr);
-          //this.log("Json", "-->", dataJson);
+          //console.log("Json", "-->", dataJson.root.Device);
 
           if (dataJson.root != null && dataJson.root.Device != null) {
             // Data available:
@@ -45,7 +45,11 @@ export class StecaDevice6003 implements IStecaDevice {
               return measurement._attributes.Type === "DC_Voltage";
             });
 
-            console.log("READ", matchingPowerAttr, matchingTempAttr, matchingVoltageAttr);
+            var productionTotalAttr = _.find(dataJson.root.Device.Yields.Yield, (yieldElement:any) => {
+              return yieldElement.Type === "Produced" && yieldElement.Slot == "Total";
+            });
+
+            //console.log("READ", matchingPowerAttr, matchingTempAttr, matchingVoltageAttr);
             
             var power = 0;
             var temperature = 0;
@@ -60,14 +64,19 @@ export class StecaDevice6003 implements IStecaDevice {
             if (matchingVoltageAttr != null)
               voltage = +matchingVoltageAttr._attributes.Value;
 
-            return new DeviceReadInfo(power, voltage, temperature, false);
+            var productionTotal = power;
+            if (productionTotalAttr != null){
+              productionTotal = +dataJson.root.Device.Yields.Yield.YieldValue._attributes["Value"];
+            }
+
+            return new DeviceReadInfo(power, voltage, temperature, productionTotal, false);
           }
         } catch (e:any){
             console.error("Error occured during load of data.", e);
             
         }
 
-        return new DeviceReadInfo(0, 0, 0, true); // Error read
+        return new DeviceReadInfo(0, 0, 0, 0, true); // Error read
     }
 
 

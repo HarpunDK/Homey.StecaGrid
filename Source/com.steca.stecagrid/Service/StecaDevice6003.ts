@@ -67,6 +67,7 @@ export class StecaDevice6003 implements IStecaDevice {
             var productionTotal = power;
             if (productionTotalAttr != null){
               productionTotal = +dataJson.root.Device.Yields.Yield.YieldValue._attributes["Value"];
+              productionTotal = productionTotal / 1000;
             }
 
             return new DeviceReadInfo(power, voltage, temperature, productionTotal, false);

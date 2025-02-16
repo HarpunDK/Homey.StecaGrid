@@ -25,5 +25,8 @@
   },
   "1.1.6": {
     "en": "measure_power added."
+  },
+  "1.1.7": {
+    "en": "Fixed decimals."
   }
 }

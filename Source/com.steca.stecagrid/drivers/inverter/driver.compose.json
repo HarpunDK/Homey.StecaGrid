@@ -7,9 +7,10 @@
     "meter_power",
     "production_capability",
     "temperature_capability",
+    "measure_power",
     "voltage_capability",
-    "alarm_capability",
-    "measure_power"
+    "ac_voltage_capability",
+    "alarm_capability"
   ],
   "capabilitiesOptions": {
     "measure_temperature": {

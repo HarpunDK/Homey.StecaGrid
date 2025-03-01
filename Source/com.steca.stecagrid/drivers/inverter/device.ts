@@ -25,6 +25,10 @@ class StecaDevice extends Homey.Device {
     await this.setCapabilityValue("production_capability", 0);
     await this.setCapabilityValue("temperature_capability", 0);
     await this.setCapabilityValue("voltage_capability", 0);
+
+    if (this.hasCapability("ac_voltage_capability"))
+      await this.setCapabilityValue("ac_voltage_capability", 0);
+
     //await this.setCapabilityValue("measure_power", 1);
     var stecaDeviceStrategy = new StecaDeviceStrategy(stecaDeviceVersion);
 
@@ -95,6 +99,9 @@ class StecaDevice extends Homey.Device {
     await this.setCapabilityValue("temperature_capability", inverterData.Temperature); 
     await this.setCapabilityValue("voltage_capability", inverterData.Voltage);
     await this.setCapabilityValue("alarm_capability", inverterData.HasError);
+
+    if (this.hasCapability("ac_voltage_capability"))
+      await this.setCapabilityValue("ac_voltage_capability", 0);
 
     if (this.hasCapability("measure_power"))
       await this.setCapabilityValue("measure_power", inverterData.Power);

@@ -20,7 +20,7 @@ export class StecaDeviceStrategy implements IStecaDevice {
         var strategies = this.CreateStrategies(deviceBaseUrl);
         
         var matchingStecaDevice = _.find(strategies, (strategy) => strategy.GetSupportedDevice() === this.stecaDeviceVersion);
-        return await matchingStecaDevice?.GetData() || new DeviceReadInfo(0,0,0,0, true);
+        return await matchingStecaDevice?.GetData() || new DeviceReadInfo(0,0,0,0,0, true);
     }
 
     private CreateStrategies = (deviceBaseUrl: string) => {

@@ -101,7 +101,7 @@ class StecaDevice extends Homey.Device {
     await this.setCapabilityValue("alarm_capability", inverterData.HasError);
 
     if (this.hasCapability("ac_voltage_capability"))
-      await this.setCapabilityValue("ac_voltage_capability", 0);
+      await this.setCapabilityValue("ac_voltage_capability", inverterData.AcVoltage);
 
     if (this.hasCapability("measure_power"))
       await this.setCapabilityValue("measure_power", inverterData.Power);

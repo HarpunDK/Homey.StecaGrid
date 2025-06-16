@@ -1,4 +1,6 @@
 import axios from 'axios';
+import _ from 'underscore';
+import xml from 'xml-js';
 
 import { DeviceReadInfo } from "../Domain/DeviceReadInfo";
 import { IStecaDevice } from "./IStecaDevice";
@@ -14,32 +16,71 @@ export class StecaDevice4200 implements IStecaDevice {
     }
 
     public async GetData() : Promise<DeviceReadInfo> {
-        
-        // Endpoint: /gen.events.table.js
-        var endpoint = `${this.baseUrl}/gen.measurements.table.js`;
-
         try {
+          var response = await axios.get(`${this.baseUrl}/all.xml`).then();
+          //console.log("RESP", response.data);
+
+          var dataJsonStr = xml.xml2json(response.data, {compact: true});
+          var dataJson = JSON.parse(dataJsonStr);
+          //console.log("Json", "-->", dataJson.root.Device);
+
+          if (dataJson.root != null && dataJson.root.Device != null) {
+            // Data available:
+
+            var matchingPowerAttr = _.find(dataJson.root.Device.Measurements.Measurement, (measurement:any) => {
+              return measurement._attributes.Type === "AC_Power";
+            });
             
-            //
-            var response = await axios.get(endpoint).then();
-            var dataTextStr = response.data;
-            //var dataTextStr = "document.write(\"<table class='invisible'><tr class='invisible'><th class='invisible'><h3>Inverter</h3></th><th class='invisible'><h3></h3></th></tr><tr class='invisible'><td class='invisible' valign='top' align='center'><table><tr><th>Name</th><th>Value</th><th>Unit</th></tr><tr><td>P DC</td><td align='right'> 777 </td><td>W</td></tr><tr><td>U DC</td><td align='right'>   1.10</td><td>V</td></tr><tr><td>I DC</td><td align='right'> 555 </td><td>A</td></tr><tr><td>U AC</td><td align='right'> 444 </td><td>V</td></tr><tr><td>I AC</td><td align='right'> 333 </td><td>A</td></tr><tr><td>F AC</td><td align='right'> 22 </td><td>Hz</td></tr><tr><td>P AC</td><td align='right'> 11 </td><td>W</td></tr></table></td><td class='invisible' valign='top' align='center'></table></td></tr></table>\");"
+            var matchingTempAttr = _.find(dataJson.root.Device.Measurements.Measurement, (measurement:any) => {
+              return measurement._attributes.Type === "Temp";
+            });
+
+            var matchingAcVoltageAttr = _.find(dataJson.root.Device.Measurements.Measurement, (measurement:any) => {
+              return measurement._attributes.Type === "AC_Voltage";
+            });
+
+            var matchingVoltageAttr = _.find(dataJson.root.Device.Measurements.Measurement, (measurement:any) => {
+              return measurement._attributes.Type === "DC_Voltage";
+            });
+
+            var productionTotalAttr = _.find(dataJson.root.Device.Yields.Yield, (yieldElement:any) => {
+              return yieldElement.Type === "Produced" && yieldElement.Slot == "Total";
+            });
+
+            //console.log("READ", matchingPowerAttr, matchingTempAttr, matchingVoltageAttr);
             
-            console.log("TEXT", "-->", dataTextStr);
-  
-            const start_p = dataTextStr.indexOf('P AC') + 27;
-            const tmpFromStart_p = dataTextStr.substring(start_p);
-            const end_p = tmpFromStart_p.indexOf('<');
-            const tmpDone_p = tmpFromStart_p.substring(0, end_p);
-            const dataInt_p = parseInt(tmpDone_p, 10);
-            const power = Number.isNaN(dataInt_p) ? 0 : dataInt_p;
-            
-            return new DeviceReadInfo(power, 0, 0, false); // Error read  
-          } catch (e:any){
-              console.error("Error occured during load of data.", endpoint, "ERROR", e);
-              
+            var power = 0;
+            var temperature = 0;
+            var voltage = 0;
+            var ac_voltage = 0;
+
+            if (matchingPowerAttr != null)
+               power = +(matchingPowerAttr._attributes.Value != null ? matchingPowerAttr._attributes.Value : 0);
+
+            if (matchingTempAttr != null)
+              temperature = +matchingTempAttr._attributes.Value;
+
+            if (matchingVoltageAttr != null)
+              voltage = +matchingVoltageAttr._attributes.Value;
+
+            if (matchingAcVoltageAttr != null)
+              ac_voltage = +matchingAcVoltageAttr._attributes.Value;
+
+            var productionTotal = power;
+            if (productionTotalAttr != null){
+              productionTotal = +dataJson.root.Device.Yields.Yield.YieldValue._attributes["Value"];
+              productionTotal = productionTotal / 1000;
+            }
+
+            return new DeviceReadInfo(power, voltage, ac_voltage, temperature, productionTotal, false);
           }
-  
-          return new DeviceReadInfo(0, 0, 0, true); // Error read  
+        } catch (e:any){
+            console.error("Error occured during load of data.", e);
+            
+        }
+
+        return new DeviceReadInfo(0, 0, 0, 0, 0, true); // Error read
     }
+
+
 }

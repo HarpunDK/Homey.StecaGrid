@@ -1,0 +1,11 @@
+{
+    "type": "number",
+    "title": { "en": "AC Voltage", "da": "AC Spænding" },
+    "uiComponent": "sensor",
+    "getable": true,
+    "setable": true,
+    "units": { "en": "V" },
+    "min": 0,
+    "insights": true,
+    "icon": "/assets/images/bolt-sharp-light.svg"
+  }

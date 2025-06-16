@@ -17,22 +17,27 @@ class StecaDevice extends Homey.Device {
     var stecaDeviceVersion = deviceData.id;
     stecaDeviceVersion = stecaDeviceVersion.split('#')[0];
     
-    this.log("DEVICE", "-->", stecaDeviceVersion);
+    this.log("DEVICE", "-->", stecaDeviceVersion, "Interval", stecaPullInterval);
     
     // RESETTING
-    this.setCapabilityOptions("meter_power", { "units": { "en": "W" } });
+    this.setCapabilityOptions("meter_power", { "units": { "en": "kWh" } }); // Back to normal
     await this.setCapabilityValue("meter_power", 0);
     await this.setCapabilityValue("production_capability", 0);
     await this.setCapabilityValue("temperature_capability", 0);
     await this.setCapabilityValue("voltage_capability", 0);
+
+    if (this.hasCapability("ac_voltage_capability"))
+      await this.setCapabilityValue("ac_voltage_capability", 0);
+
     //await this.setCapabilityValue("measure_power", 1);
     var stecaDeviceStrategy = new StecaDeviceStrategy(stecaDeviceVersion);
 
 
     await this.loadCurrentData(stecaDeviceStrategy);
     this.homey.setInterval(async () => {
+      this.log("Data pull");
       await this.loadCurrentData(stecaDeviceStrategy,);
-    }, stecaPullInterval * 1000 /* pull every 2. minute */);
+    }, stecaPullInterval * 1000 /* pull every interval as seconds minute */);
 
 
 
@@ -90,11 +95,17 @@ class StecaDevice extends Homey.Device {
     var inverterData = await stecaDevice.GetData(deviceBaseUrl);
     this.log("InverterData", "READ", inverterData);
     
-    await this.setCapabilityValue("meter_power", inverterData.Power);
+    await this.setCapabilityValue("meter_power", inverterData.ProductionTotal);
     await this.setCapabilityValue("production_capability", inverterData.Power);
     await this.setCapabilityValue("temperature_capability", inverterData.Temperature); 
     await this.setCapabilityValue("voltage_capability", inverterData.Voltage);
     await this.setCapabilityValue("alarm_capability", inverterData.HasError);
+
+    if (this.hasCapability("ac_voltage_capability"))
+      await this.setCapabilityValue("ac_voltage_capability", inverterData.AcVoltage);
+
+    if (this.hasCapability("measure_power"))
+      await this.setCapabilityValue("measure_power", inverterData.Power);
   }
 
   private ResolveDeviceBaseUrl = () : string => {

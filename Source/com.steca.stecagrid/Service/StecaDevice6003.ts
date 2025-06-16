@@ -1,6 +1,5 @@
 import axios from 'axios';
 import _ from 'underscore';
-import moment from 'moment';
 import xml from 'xml-js';
 
 import { DeviceReadInfo } from "../Domain/DeviceReadInfo";
@@ -17,18 +16,13 @@ export class StecaDevice6003 implements IStecaDevice {
     }
 
     public async GetData() : Promise<DeviceReadInfo> {
-        // Get data from endpoint: /measurements.xml + timestamp
-        //console.log("STRATEGY ACTIVATED", 6003);
-
-        var currentTimestamp = moment().utc().valueOf();
-
         try {
-          var response = await axios.get(`${this.baseUrl}/measurements.xml?${currentTimestamp}`).then();
-          // this.log("RESP", response.data);
+          var response = await axios.get(`${this.baseUrl}/all.xml`).then();
+          //console.log("RESP", response.data);
 
           var dataJsonStr = xml.xml2json(response.data, {compact: true});
           var dataJson = JSON.parse(dataJsonStr);
-          //this.log("Json", "-->", dataJson);
+          //console.log("Json", "-->", dataJson.root.Device);
 
           if (dataJson.root != null && dataJson.root.Device != null) {
             // Data available:
@@ -41,15 +35,24 @@ export class StecaDevice6003 implements IStecaDevice {
               return measurement._attributes.Type === "Temp";
             });
 
+            var matchingAcVoltageAttr = _.find(dataJson.root.Device.Measurements.Measurement, (measurement:any) => {
+              return measurement._attributes.Type === "AC_Voltage1";
+            });
+
             var matchingVoltageAttr = _.find(dataJson.root.Device.Measurements.Measurement, (measurement:any) => {
               return measurement._attributes.Type === "DC_Voltage";
             });
 
-            console.log("READ", matchingPowerAttr, matchingTempAttr, matchingVoltageAttr);
+            var productionTotalAttr = _.find(dataJson.root.Device.Yields.Yield, (yieldElement:any) => {
+              return yieldElement.Type === "Produced" && yieldElement.Slot == "Total";
+            });
+
+            //console.log("READ", matchingPowerAttr, matchingTempAttr, matchingVoltageAttr);
             
             var power = 0;
             var temperature = 0;
             var voltage = 0;
+            var ac_voltage = 0;
 
             if (matchingPowerAttr != null)
                power = +(matchingPowerAttr._attributes.Value != null ? matchingPowerAttr._attributes.Value : 0);
@@ -60,14 +63,23 @@ export class StecaDevice6003 implements IStecaDevice {
             if (matchingVoltageAttr != null)
               voltage = +matchingVoltageAttr._attributes.Value;
 
-            return new DeviceReadInfo(power, voltage, temperature, false);
+            if (matchingAcVoltageAttr != null)
+              ac_voltage = +matchingAcVoltageAttr._attributes.Value;
+
+            var productionTotal = power;
+            if (productionTotalAttr != null){
+              productionTotal = +dataJson.root.Device.Yields.Yield.YieldValue._attributes["Value"];
+              productionTotal = productionTotal / 1000;
+            }
+
+            return new DeviceReadInfo(power, voltage, ac_voltage, temperature, productionTotal, false);
           }
         } catch (e:any){
             console.error("Error occured during load of data.", e);
             
         }
 
-        return new DeviceReadInfo(0, 0, 0, true); // Error read
+        return new DeviceReadInfo(0, 0, 0, 0, 0, true); // Error read
     }
 
 

@@ -17,10 +17,10 @@ class StecaDevice extends Homey.Device {
     var stecaDeviceVersion = deviceData.id;
     stecaDeviceVersion = stecaDeviceVersion.split('#')[0];
     
-    this.log("DEVICE", "-->", stecaDeviceVersion);
+    this.log("DEVICE", "-->", stecaDeviceVersion, "Interval", stecaPullInterval);
     
     // RESETTING
-    this.setCapabilityOptions("meter_power", { "units": { "en": "W" } });
+    this.setCapabilityOptions("meter_power", { "units": { "en": "kWh" } }); // Back to normal
     await this.setCapabilityValue("meter_power", 0);
     await this.setCapabilityValue("production_capability", 0);
     await this.setCapabilityValue("temperature_capability", 0);
@@ -35,8 +35,9 @@ class StecaDevice extends Homey.Device {
 
     await this.loadCurrentData(stecaDeviceStrategy);
     this.homey.setInterval(async () => {
+      this.log("Data pull");
       await this.loadCurrentData(stecaDeviceStrategy,);
-    }, stecaPullInterval * 1000 /* pull every 2. minute */);
+    }, stecaPullInterval * 1000 /* pull every interval as seconds minute */);
 
 
 
